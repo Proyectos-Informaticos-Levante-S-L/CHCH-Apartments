@@ -1,0 +1,472 @@
+---
+import type { Apartamento } from "../data/apartamentos";
+
+const { apartamentos = [] } = Astro.props as { apartamentos: Apartamento[] };
+const disponibles = apartamentos.filter((a) => a.disponible);
+---
+
+<section id="solicitud" class="bg-[var(--color-tinta)] py-20 text-white">
+  <div class="mx-auto grid max-w-6xl gap-12 px-6 md:grid-cols-2">
+
+    <!-- Texto lateral -->
+    <div>
+      <p class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-terracota)]">
+        Contacto
+      </p>
+      <h2 class="font-display text-4xl font-semibold tracking-tight">
+        ¿Hablamos?
+      </h2>
+      <p class="mt-6 max-w-md text-white/70">
+        Cuéntanos qué alojamiento te interesa o cualquier duda que tengas.
+        Te responderemos lo antes posible.
+      </p>
+
+      <div class="mt-10 space-y-3 text-sm text-white/80">
+        <p>✉️ hola@chchapartments.com</p>
+        <p>📞 600 123 456</p>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form
+      id="form-contacto"
+      action="https://formspree.io/f/TU_ID"
+      method="POST"
+      class="space-y-5 rounded-3xl bg-[var(--color-crema)]/95 p-8 text-[var(--color-tinta)] backdrop-blur"
+      novalidate
+    >
+      <!-- Nombre + Apellidos -->
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="nombre" class="mb-1.5 block text-sm font-medium">
+            Nombre <span class="text-[var(--color-terracota)]">*</span>
+          </label>
+          <input
+            type="text" id="nombre" name="nombre" required
+            class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-sm outline-none transition focus:border-[var(--color-terracota)] focus:bg-white"
+            placeholder="Tu nombre"
+          />
+          <p class="error mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="apellidos" class="mb-1.5 block text-sm font-medium">
+            Apellidos <span class="text-[var(--color-terracota)]">*</span>
+          </label>
+          <input
+            type="text" id="apellidos" name="apellidos" required
+            class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-sm outline-none transition focus:border-[var(--color-terracota)] focus:bg-white"
+            placeholder="Tus apellidos"
+          />
+          <p class="error mt-1 hidden text-xs text-red-600"></p>
+        </div>
+      </div>
+
+      <!-- Email + Teléfono -->
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="email" class="mb-1.5 block text-sm font-medium">
+            Correo electrónico <span class="text-[var(--color-terracota)]">*</span>
+          </label>
+          <input
+            type="email" id="email" name="email" required
+            class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-sm outline-none transition focus:border-[var(--color-terracota)] focus:bg-white"
+            placeholder="tu@email.com"
+          />
+          <p class="error mt-1 hidden text-xs text-red-600"></p>
+        </div>
+        <div>
+          <label for="telefono" class="mb-1.5 block text-sm font-medium">
+            Teléfono <span class="text-[var(--color-gris)]">(opcional)</span>
+          </label>
+          <input
+            type="tel" id="telefono" name="telefono"
+            class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-sm outline-none transition focus:border-[var(--color-terracota)] focus:bg-white"
+            placeholder="600 000 000"
+          />
+        </div>
+      </div>
+
+      <!-- Apartamento de interés (desplegable con foto) -->
+      <div>
+        <label class="mb-1.5 block text-sm font-medium">
+          Apartamento de interés <span class="text-[var(--color-gris)]">(opcional)</span>
+        </label>
+        <div class="relative">
+          <input type="hidden" name="apartamento" id="apartamento-valor" />
+
+          <button
+            type="button"
+            id="dropdown-btn"
+            class="flex w-full items-center justify-between rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-left text-sm outline-none transition hover:bg-white"
+          >
+            <span id="dropdown-label" class="text-[var(--color-gris)]">Selecciona un apartamento</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--color-gris)]">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          <div
+            id="dropdown-lista"
+            class="absolute z-20 mt-2 hidden max-h-72 w-full overflow-y-auto rounded-xl border border-[var(--color-arena-oscuro)] bg-white/95 shadow-xl backdrop-blur"
+          >
+            <button
+              type="button"
+              class="opcion flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition hover:bg-[var(--color-crema)]"
+              data-valor=""
+            >
+              <span class="text-[var(--color-gris)]">Sin preferencia</span>
+            </button>
+            {
+              disponibles.map((apto) => (
+                <button
+                  type="button"
+                  class="opcion flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition hover:bg-[var(--color-crema)]"
+                  data-valor={apto.nombre}
+                  data-img={apto.imagenes[0]}
+                >
+                  <img src={apto.imagenes[0]} alt={apto.nombre} class="h-10 w-14 flex-shrink-0 rounded-lg object-cover" />
+                  <span class="flex flex-col">
+                    <span class="font-medium text-[var(--color-tinta)]">{apto.nombre}</span>
+                    <span class="text-xs text-[var(--color-gris)]">{apto.precioNoche}€/noche · {apto.ubicacion}</span>
+                  </span>
+                </button>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Selector de fechas -->
+      <div>
+        <label class="mb-1.5 block text-sm font-medium">
+          Fechas de estancia <span class="text-[var(--color-terracota)]">*</span>
+        </label>
+        <button
+          type="button"
+          id="fechas-btn"
+          class="flex w-full items-center justify-between rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-left text-sm outline-none transition hover:bg-white"
+        >
+          <span id="fechas-label" class="text-[var(--color-gris)]">Selecciona las fechas</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--color-gris)]">
+            <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+        </button>
+
+        <!-- Calendario (en el flujo, no flotante) -->
+        <div id="cal-panel" class="mt-2 hidden rounded-xl border border-[var(--color-arena-oscuro)] bg-white p-4 shadow-sm">
+          <div class="mb-3 flex items-center justify-between">
+            <button type="button" id="cal-prev" class="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-[var(--color-crema)]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span id="cal-titulo" class="text-sm font-medium capitalize text-[var(--color-tinta)]"></span>
+            <button type="button" id="cal-next" class="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-[var(--color-crema)]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div class="grid grid-cols-7 gap-y-1 text-center text-xs text-[var(--color-gris)]">
+            <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+          </div>
+          <div id="cal-dias" class="mt-1 grid grid-cols-7 gap-y-1 text-center text-sm"></div>
+
+          <!-- Acciones -->
+          <div class="mt-4 flex items-center justify-center gap-6 border-t border-[var(--color-arena-oscuro)] pt-3 text-xs">
+            <button type="button" id="cal-borrar" class="text-[var(--color-gris)] transition hover:text-red-600">Borrar</button>
+            <button type="button" id="cal-cancelar" class="text-[var(--color-gris)] transition hover:text-[var(--color-tinta)]">Cancelar</button>
+            <button type="button" id="cal-confirmar" class="font-medium text-[var(--color-terracota)] transition hover:text-[var(--color-terracota-oscuro)]">Confirmar</button>
+          </div>
+        </div>
+        <p class="error mt-1 hidden text-xs text-red-600"></p>
+      </div>
+
+      <!-- Mensaje -->
+      <div>
+        <label for="mensaje" class="mb-1.5 block text-sm font-medium">
+          ¿En qué podemos ayudarte? <span class="text-[var(--color-terracota)]">*</span>
+        </label>
+        <textarea
+          id="mensaje" name="mensaje" rows="4" required
+          class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white/80 px-4 py-3 text-sm outline-none transition focus:border-[var(--color-terracota)] focus:bg-white"
+          placeholder="Cuéntanos qué alojamiento te interesa, fechas, dudas..."
+        ></textarea>
+        <p class="error mt-1 hidden text-xs text-red-600"></p>
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-full bg-[var(--color-terracota)] px-6 py-3.5 text-sm font-medium text-white transition hover:bg-[var(--color-terracota-oscuro)]"
+      >
+        Enviar mensaje
+      </button>
+
+      <p id="form-ok" class="hidden rounded-xl bg-[var(--color-oliva)]/10 px-4 py-3 text-center text-sm font-medium text-[var(--color-oliva)]">
+        ✓ ¡Mensaje enviado! Te responderemos pronto.
+      </p>
+    </form>
+
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById("form-contacto") as HTMLFormElement;
+  const okMsg = document.getElementById("form-ok") as HTMLElement;
+
+  // --- Desplegable personalizado ---
+  const dropBtn = document.getElementById("dropdown-btn") as HTMLButtonElement;
+  const dropLista = document.getElementById("dropdown-lista") as HTMLElement;
+  const dropLabel = document.getElementById("dropdown-label") as HTMLElement;
+  const dropValor = document.getElementById("apartamento-valor") as HTMLInputElement;
+
+  dropBtn.addEventListener("click", () => dropLista.classList.toggle("hidden"));
+
+  document.querySelectorAll(".opcion").forEach((op) => {
+    op.addEventListener("click", () => {
+      const valor = (op as HTMLElement).dataset.valor || "";
+      const img = (op as HTMLElement).dataset.img;
+      dropValor.value = valor;
+      if (valor) {
+        dropLabel.innerHTML =
+          `<span class="inline-flex items-center gap-2"><img src="${img}" class="h-6 w-9 rounded object-cover"/> <span class="text-[var(--color-tinta)]">${valor}</span></span>`;
+      } else {
+        dropLabel.textContent = "Sin preferencia";
+      }
+      dropLista.classList.add("hidden");
+    });
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!dropBtn.contains(e.target as Node) && !dropLista.contains(e.target as Node)) {
+      dropLista.classList.add("hidden");
+    }
+  });
+
+  // --- Calendario de rango ---
+  const fechasBtn = document.getElementById("fechas-btn") as HTMLButtonElement;
+  const fechasLabel = document.getElementById("fechas-label") as HTMLElement;
+  const fechasValor = document.getElementById("fechas-valor") as HTMLInputElement | null;
+  const calPanel = document.getElementById("cal-panel") as HTMLElement;
+  const calTitulo = document.getElementById("cal-titulo") as HTMLElement;
+  const calDias = document.getElementById("cal-dias") as HTMLElement;
+  const calPrev = document.getElementById("cal-prev") as HTMLButtonElement;
+  const calNext = document.getElementById("cal-next") as HTMLButtonElement;
+  const calBorrar = document.getElementById("cal-borrar") as HTMLButtonElement;
+  const calCancelar = document.getElementById("cal-cancelar") as HTMLButtonElement;
+  const calConfirmar = document.getElementById("cal-confirmar") as HTMLButtonElement;
+
+  // Campo oculto creado por JS (para enviar el valor)
+  const fechasInput = document.createElement("input");
+  fechasInput.type = "hidden";
+  fechasInput.name = "fechas";
+  form.appendChild(fechasInput);
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  let mesVista = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  let inicio: Date | null = null;
+  let fin: Date | null = null;
+  // Selección temporal (se confirma con "Confirmar")
+  let tmpInicio: Date | null = null;
+  let tmpFin: Date | null = null;
+  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+  function fmt(d: Date) {
+    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+  }
+
+  function pintarCalendario() {
+    calTitulo.textContent = meses[mesVista.getMonth()] + " " + mesVista.getFullYear();
+    calDias.innerHTML = "";
+
+    const primerDia = new Date(mesVista.getFullYear(), mesVista.getMonth(), 1);
+    const offset = (primerDia.getDay() + 6) % 7;
+    const diasMes = new Date(mesVista.getFullYear(), mesVista.getMonth() + 1, 0).getDate();
+
+    for (let i = 0; i < offset; i++) {
+      calDias.appendChild(document.createElement("span"));
+    }
+
+    for (let dia = 1; dia <= diasMes; dia++) {
+      const fecha = new Date(mesVista.getFullYear(), mesVista.getMonth(), dia);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = String(dia);
+      btn.className = "mx-auto flex h-8 w-8 items-center justify-center rounded-full transition";
+
+      if (fecha < hoy) {
+        btn.className += " cursor-not-allowed text-[var(--color-arena-oscuro)]";
+        btn.disabled = true;
+      } else {
+        const esInicio = tmpInicio && fecha.getTime() === tmpInicio.getTime();
+        const esFin = tmpFin && fecha.getTime() === tmpFin.getTime();
+        const enMedio = tmpInicio && tmpFin && fecha > tmpInicio && fecha < tmpFin;
+
+        if (esInicio || esFin) {
+          btn.className += " bg-[var(--color-terracota)] text-white";
+        } else if (enMedio) {
+          btn.className += " bg-[var(--color-terracota)]/20 text-[var(--color-tinta)]";
+        } else {
+          btn.className += " text-[var(--color-tinta)] hover:bg-[var(--color-crema)]";
+        }
+        btn.addEventListener("click", () => seleccionar(fecha));
+      }
+      calDias.appendChild(btn);
+    }
+  }
+
+  function seleccionar(fecha: Date) {
+    if (!tmpInicio || (tmpInicio && tmpFin)) {
+      tmpInicio = fecha;
+      tmpFin = null;
+    } else if (fecha < tmpInicio) {
+      tmpInicio = fecha;
+    } else {
+      tmpFin = fecha;
+    }
+    pintarCalendario();
+  }
+
+  function actualizarLabel() {
+    if (inicio && fin) {
+      fechasLabel.textContent = fmt(inicio) + " → " + fmt(fin);
+      fechasLabel.classList.remove("text-[var(--color-gris)]");
+      fechasLabel.classList.add("text-[var(--color-tinta)]");
+      fechasInput.value = fmt(inicio) + " - " + fmt(fin);
+    } else {
+      fechasLabel.textContent = "Selecciona las fechas";
+      fechasLabel.classList.add("text-[var(--color-gris)]");
+      fechasLabel.classList.remove("text-[var(--color-tinta)]");
+      fechasInput.value = "";
+    }
+  }
+
+  function abrirCal() {
+    tmpInicio = inicio;
+    tmpFin = fin;
+    calPanel.classList.remove("hidden");
+    pintarCalendario();
+  }
+  function cerrarCal() {
+    calPanel.classList.add("hidden");
+  }
+
+  fechasBtn.addEventListener("click", () => {
+    if (calPanel.classList.contains("hidden")) abrirCal();
+    else cerrarCal();
+  });
+  calPrev.addEventListener("click", () => {
+    mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() - 1, 1);
+    pintarCalendario();
+  });
+  calNext.addEventListener("click", () => {
+    mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() + 1, 1);
+    pintarCalendario();
+  });
+
+  // Acciones
+  calBorrar.addEventListener("click", () => {
+    tmpInicio = null;
+    tmpFin = null;
+    pintarCalendario();
+  });
+  calCancelar.addEventListener("click", () => {
+    tmpInicio = inicio;
+    tmpFin = fin;
+    cerrarCal();
+  });
+  calConfirmar.addEventListener("click", () => {
+    inicio = tmpInicio;
+    fin = tmpFin;
+    actualizarLabel();
+    if (inicio && fin) fechasBtn.classList.remove("border-red-500");
+    cerrarCal();
+  });
+
+  // --- Validación ---
+  const reglas: Record<string, string> = {
+    nombre: "Por favor, introduce tu nombre.",
+    apellidos: "Por favor, introduce tus apellidos.",
+    email: "Por favor, introduce un correo válido.",
+    mensaje: "Por favor, escribe tu mensaje.",
+  };
+
+  function validarCampo(campo: string): boolean {
+    const input = form.elements.namedItem(campo) as HTMLInputElement | HTMLTextAreaElement;
+    const error = input.parentElement?.querySelector(".error") as HTMLElement | null;
+    let valido = input.value.trim() !== "";
+
+    if (campo === "email" && valido) {
+      valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+    }
+
+    if (!valido) {
+      input.classList.add("border-red-500");
+      if (error) {
+        error.textContent = reglas[campo];
+        error.classList.remove("hidden");
+      }
+    } else {
+      input.classList.remove("border-red-500");
+      if (error) error.classList.add("hidden");
+    }
+    return valido;
+  }
+
+  function resetearTodo() {
+    form.reset();
+    dropLabel.textContent = "Selecciona un apartamento";
+    dropValor.value = "";
+    inicio = null; fin = null; tmpInicio = null; tmpFin = null;
+    actualizarLabel();
+    cerrarCal();
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let todoOk = true;
+    for (const campo in reglas) {
+      if (!validarCampo(campo)) todoOk = false;
+    }
+
+    if (!fechasInput.value) {
+      fechasBtn.classList.add("border-red-500");
+      todoOk = false;
+    } else {
+      fechasBtn.classList.remove("border-red-500");
+    }
+
+    if (!todoOk) return;
+
+    if (!form.action.includes("TU_ID")) {
+      fetch(form.action, {
+        method: "POST",
+        body: new FormData(form),
+        headers: { Accept: "application/json" },
+      })
+        .then((res) => {
+          if (res.ok) {
+            resetearTodo();
+            okMsg.classList.remove("hidden");
+          }
+        })
+        .catch(() => {});
+    } else {
+      resetearTodo();
+      okMsg.classList.remove("hidden");
+    }
+  });
+
+  for (const campo in reglas) {
+    const el = form.elements.namedItem(campo) as HTMLElement;
+    el.addEventListener("input", () => validarCampo(campo));
+  }
+</script>
+
+<style>
+  /* Scroll oculto pero funcional */
+  #dropdown-lista {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  #dropdown-lista::-webkit-scrollbar {
+    display: none;
+  }
+</style>

@@ -1,0 +1,18 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Hero from "../components/Hero.astro";
+import Apartamentos from "../components/Apartamentos.astro";
+import Formulario from "../components/Formulario.astro";
+import Footer from "../components/Footer.astro";
+import { apartamentos } from '../data/apartamentos.ts';
+
+---
+
+<Layout title="CHCH Apartments">
+  <Header />
+  <Hero />
+  <Apartamentos />
+  <Formulario apartamentos={apartamentos} />
+  <Footer />
+</Layout>

@@ -1,0 +1,577 @@
+---
+import { apartamentos } from "../data/apartamentos.ts";
+---
+
+<section id="apartamentos" class="mx-auto max-w-6xl px-6 py-20">
+  <div class="mb-12 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="mb-2 text-xs font-medium uppercase tracking-[0.2em] text-[var(--color-oliva)]">
+        Nuestros alojamientos
+      </p>
+      <h2 class="font-display text-4xl font-semibold tracking-tight text-[var(--color-tinta)]">
+        Apartamentos para tu estancia
+      </h2>
+    </div>
+    <p class="max-w-xs text-sm text-[var(--color-gris)]">
+      Todos equipados, con ropa de cama, cocina completa y wifi. Listos para disfrutar.
+    </p>
+  </div>
+
+  <div class="grid gap-8 sm:grid-cols-2">
+    {
+      apartamentos.map((apto, i) => (
+        <article class="group overflow-hidden rounded-3xl border border-[var(--color-arena-oscuro)] bg-white transition hover:shadow-xl">
+          <button
+            type="button"
+            class="abrir-modal relative block aspect-[3/2] w-full overflow-hidden text-left"
+            data-index={i}
+            aria-label={`Ver fotos de ${apto.nombre}`}
+          >
+            <img
+              src={apto.imagenes[0]}
+              alt={apto.nombre}
+              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+            <span class="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/20 group-hover:opacity-100">
+              <span class="rounded-full bg-white/90 px-4 py-2 text-xs font-medium text-[var(--color-tinta)]">
+                Ver fotos
+              </span>
+            </span>
+            {apto.disponible ? (
+              <span class="absolute left-4 top-4 rounded-full bg-[var(--color-oliva)] px-3 py-1 text-xs font-medium text-white">
+                Disponible
+              </span>
+            ) : (
+              <span class="absolute left-4 top-4 rounded-full bg-[var(--color-gris)] px-3 py-1 text-xs font-medium text-white">
+                No disponible
+              </span>
+            )}
+          </button>
+
+          <div class="p-6">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="font-display text-xl font-semibold text-[var(--color-tinta)]">{apto.nombre}</h3>
+                <p class="text-sm text-[var(--color-gris)]">{apto.ubicacion}</p>
+              </div>
+              <p class="whitespace-nowrap font-display text-xl font-semibold text-[var(--color-terracota)]">
+                {apto.precioNoche}€<span class="text-sm font-normal text-[var(--color-gris)]">/noche</span>
+              </p>
+            </div>
+
+            <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-[var(--color-arena-oscuro)] pt-4 text-sm text-[var(--color-gris)]">
+              <span>{apto.huespedes} huésped{apto.huespedes > 1 ? "es" : ""}</span>
+              <span>{apto.habitaciones} hab.</span>
+              <span>{apto.banos} baño{apto.banos > 1 ? "s" : ""}</span>
+              <span>{apto.metros} m²</span>
+            </div>
+
+            <button
+              type="button"
+              class={`abrir-modal mt-5 block w-full rounded-full px-5 py-2.5 text-center text-sm font-medium transition ${
+                apto.disponible
+                  ? "bg-[var(--color-tinta)] text-white hover:opacity-90"
+                  : "pointer-events-none bg-[var(--color-arena-oscuro)] text-[var(--color-gris)]"
+              }`}
+              data-index={i}
+              disabled={!apto.disponible}
+            >
+              {apto.disponible ? "Ver detalles" : "No disponible"}
+            </button>
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<!-- MODAL -->
+<div
+  id="modal-apto"
+  class="fixed inset-0 z-[100] hidden items-center justify-center p-4"
+  role="dialog"
+  aria-modal="true"
+>
+  <div id="modal-fondo" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+  <div class="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl md:flex-row md:items-stretch">
+
+    <button
+      id="modal-cerrar"
+      class="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[var(--color-tinta)] shadow transition hover:bg-white"
+      aria-label="Cerrar"
+    >
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="6" y1="6" x2="18" y2="18" />
+        <line x1="18" y1="6" x2="6" y2="18" />
+      </svg>
+    </button>
+
+    <!-- Galería -->
+    <div class="relative w-full bg-black md:w-3/5">
+      <img id="modal-img" src="" alt="" class="aspect-[4/3] h-full w-full object-cover md:absolute md:inset-0 md:aspect-auto" />
+      <button id="modal-prev" class="absolute left-3 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[var(--color-tinta)] transition hover:bg-white" aria-label="Anterior">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button id="modal-next" class="absolute right-3 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[var(--color-tinta)] transition hover:bg-white" aria-label="Siguiente">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <span id="modal-contador" class="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs text-white"></span>
+    </div>
+
+    <!-- Barra lateral -->
+    <div class="scroll-disimulado flex w-full flex-col overflow-y-auto p-6 md:w-2/5">
+
+      <!-- VISTA 1: INFO -->
+      <div id="vista-info">
+        <span id="modal-estado" class="mb-3 w-fit rounded-full px-3 py-1 text-xs font-medium text-white"></span>
+        <h3 id="modal-nombre" class="font-display text-2xl font-semibold text-[var(--color-tinta)]"></h3>
+        <p id="modal-ubicacion" class="text-sm text-[var(--color-gris)]"></p>
+        <p id="modal-precio" class="mt-4 font-display text-2xl font-semibold text-[var(--color-terracota)]"></p>
+        <div id="modal-specs" class="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-y border-[var(--color-arena-oscuro)] py-4 text-sm text-[var(--color-gris)]"></div>
+        <p id="modal-descripcion" class="mt-4 text-sm leading-relaxed text-[var(--color-gris)]"></p>
+        <div class="mt-4">
+          <p class="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--color-oliva)]">Servicios</p>
+          <div id="modal-servicios" class="flex flex-wrap gap-2"></div>
+        </div>
+
+        <!-- Minimapa de ubicación -->
+        <div class="mt-4">
+          <p class="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--color-oliva)]">Ubicación</p>
+          <div id="modal-mini-mapa" class="h-40 w-full overflow-hidden rounded-xl border border-[var(--color-arena-oscuro)]"></div>
+        </div>
+
+        <button type="button" id="btn-reservar" class="mt-6 block w-full rounded-full bg-[var(--color-terracota)] px-5 py-3 text-center text-sm font-medium text-white transition hover:bg-[var(--color-terracota-oscuro)]">
+          Reservar este alojamiento
+        </button>
+      </div>
+
+      <!-- VISTA 2: FORMULARIO -->
+      <div id="vista-form" class="hidden">
+        <button type="button" id="form-volver" class="mb-4 flex items-center gap-1 text-sm text-[var(--color-gris)] transition hover:text-[var(--color-tinta)]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Volver
+        </button>
+
+        <h3 class="font-display text-2xl font-semibold text-[var(--color-tinta)]">Reservar</h3>
+
+        <!-- Alojamiento fijo -->
+        <div class="mt-4 flex items-center gap-3 rounded-xl bg-[var(--color-crema)] p-3">
+          <img id="form-apto-img" src="" alt="" class="h-12 w-16 flex-shrink-0 rounded-lg object-cover" />
+          <div>
+            <p class="text-xs uppercase tracking-wide text-[var(--color-oliva)]">Alojamiento</p>
+            <p id="form-apto-nombre" class="text-sm font-medium text-[var(--color-tinta)]"></p>
+          </div>
+        </div>
+
+        <form id="modal-form" class="mt-5 space-y-4" novalidate>
+          <input type="hidden" name="apartamento" id="form-apto-valor" />
+
+          <div>
+            <input type="text" name="nombre" required placeholder="Nombre *"
+              class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[var(--color-terracota)]" />
+            <p class="error mt-1 hidden text-xs text-red-600"></p>
+          </div>
+          <div>
+            <input type="text" name="apellidos" required placeholder="Apellidos *"
+              class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[var(--color-terracota)]" />
+            <p class="error mt-1 hidden text-xs text-red-600"></p>
+          </div>
+          <div>
+            <input type="email" name="email" required placeholder="Correo electrónico *"
+              class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[var(--color-terracota)]" />
+            <p class="error mt-1 hidden text-xs text-red-600"></p>
+          </div>
+          <div>
+            <input type="tel" name="telefono" placeholder="Teléfono (opcional)"
+              class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[var(--color-terracota)]" />
+          </div>
+
+          <!-- Selector de fechas -->
+          <div>
+            <button
+              type="button"
+              id="modal-fechas-btn"
+              class="flex w-full items-center justify-between rounded-xl border border-[var(--color-arena-oscuro)] bg-white px-4 py-2.5 text-left text-sm outline-none transition hover:border-[var(--color-terracota)]"
+            >
+              <span id="modal-fechas-label" class="text-[var(--color-gris)]">Fechas de estancia *</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--color-gris)]">
+                <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </button>
+
+            <div id="modal-cal-panel" class="mt-2 hidden rounded-xl border border-[var(--color-arena-oscuro)] bg-white p-4 shadow-sm">
+              <div class="mb-3 flex items-center justify-between">
+                <button type="button" id="modal-cal-prev" class="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-[var(--color-crema)]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                <span id="modal-cal-titulo" class="text-sm font-medium capitalize text-[var(--color-tinta)]"></span>
+                <button type="button" id="modal-cal-next" class="flex h-7 w-7 items-center justify-center rounded-full transition hover:bg-[var(--color-crema)]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
+              </div>
+              <div class="grid grid-cols-7 gap-y-1 text-center text-xs text-[var(--color-gris)]">
+                <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+              </div>
+              <div id="modal-cal-dias" class="mt-1 grid grid-cols-7 gap-y-1 text-center text-sm"></div>
+              <div class="mt-4 flex items-center justify-center gap-6 border-t border-[var(--color-arena-oscuro)] pt-3 text-xs">
+                <button type="button" id="modal-cal-borrar" class="text-[var(--color-gris)] transition hover:text-red-600">Borrar</button>
+                <button type="button" id="modal-cal-cancelar" class="text-[var(--color-gris)] transition hover:text-[var(--color-tinta)]">Cancelar</button>
+                <button type="button" id="modal-cal-confirmar" class="font-medium text-[var(--color-terracota)] transition hover:text-[var(--color-terracota-oscuro)]">Confirmar</button>
+              </div>
+            </div>
+            <p class="error mt-1 hidden text-xs text-red-600"></p>
+          </div>
+
+          <div>
+            <textarea name="mensaje" rows="3" required placeholder="¿En qué podemos ayudarte? *"
+              class="w-full rounded-xl border border-[var(--color-arena-oscuro)] bg-white px-4 py-2.5 text-sm outline-none transition focus:border-[var(--color-terracota)]"></textarea>
+            <p class="error mt-1 hidden text-xs text-red-600"></p>
+          </div>
+
+          <button type="submit" class="w-full rounded-full bg-[var(--color-terracota)] px-5 py-3 text-sm font-medium text-white transition hover:bg-[var(--color-terracota-oscuro)]">
+            Enviar solicitud
+          </button>
+        </form>
+      </div>
+
+      <!-- VISTA 3: ENVIADO -->
+      <div id="vista-ok" class="hidden flex-col items-center justify-center py-16 text-center">
+        <div class="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-oliva)] text-white">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <p class="mt-4 font-display text-xl font-semibold text-[var(--color-tinta)]">¡Solicitud enviada!</p>
+        <p class="mt-1 text-sm text-[var(--color-gris)]">Te responderemos pronto.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<script define:vars={{ apartamentos }}>
+  const modal = document.getElementById("modal-apto");
+  const fondo = document.getElementById("modal-fondo");
+  const cerrar = document.getElementById("modal-cerrar");
+  const img = document.getElementById("modal-img");
+  const prev = document.getElementById("modal-prev");
+  const next = document.getElementById("modal-next");
+  const contador = document.getElementById("modal-contador");
+
+  const vistaInfo = document.getElementById("vista-info");
+  const vistaForm = document.getElementById("vista-form");
+  const vistaOk = document.getElementById("vista-ok");
+  const btnReservar = document.getElementById("btn-reservar");
+  const btnVolver = document.getElementById("form-volver");
+  const form = document.getElementById("modal-form");
+
+  let aptoActual = null;
+  let fotoActual = 0;
+
+  // --- Minimapa ---
+  let miniMapa = null;
+  let miniMarcador = null;
+  function iconoMini() {
+    return window.L.divIcon({
+      className: "",
+      html: '<div style="width:14px;height:14px;background:#c2683f;border:2px solid white;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.3)"></div>',
+      iconSize: [14, 14],
+      iconAnchor: [7, 7],
+    });
+  }
+  function pintarMiniMapa() {
+    if (!aptoActual || !window.L) return;
+    const { lat, lng } = aptoActual.coordenadas;
+    if (!miniMapa) {
+      miniMapa = window.L.map("modal-mini-mapa", {
+        scrollWheelZoom: false,
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([lat, lng], 14);
+      window.L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+        subdomains: "abcd",
+      }).addTo(miniMapa);
+      miniMarcador = window.L.marker([lat, lng], { icon: iconoMini() }).addTo(miniMapa);
+    } else {
+      miniMapa.setView([lat, lng], 14);
+      miniMarcador.setLatLng([lat, lng]);
+    }
+    setTimeout(() => miniMapa.invalidateSize(), 100);
+  }
+
+  function pintarFoto() {
+    if (!aptoActual) return;
+    img.src = aptoActual.imagenes[fotoActual];
+    img.alt = aptoActual.nombre + " - foto " + (fotoActual + 1);
+    contador.textContent = (fotoActual + 1) + " / " + aptoActual.imagenes.length;
+  }
+
+  function mostrarInfo() {
+    vistaInfo.classList.remove("hidden");
+    vistaForm.classList.add("hidden");
+    vistaOk.classList.add("hidden");
+    vistaOk.classList.remove("flex");
+  }
+
+  function abrir(index) {
+    aptoActual = apartamentos[index];
+    fotoActual = 0;
+
+    document.getElementById("modal-nombre").textContent = aptoActual.nombre;
+    document.getElementById("modal-ubicacion").textContent = aptoActual.ubicacion;
+    document.getElementById("modal-precio").innerHTML =
+      aptoActual.precioNoche + "€<span class='text-sm font-normal text-[var(--color-gris)]'>/noche</span>";
+    document.getElementById("modal-descripcion").textContent = aptoActual.descripcion;
+
+    const estado = document.getElementById("modal-estado");
+    if (aptoActual.disponible) {
+      estado.textContent = "Disponible";
+      estado.style.backgroundColor = "var(--color-oliva)";
+    } else {
+      estado.textContent = "No disponible";
+      estado.style.backgroundColor = "var(--color-gris)";
+    }
+
+    const specs = document.getElementById("modal-specs");
+    const plural = (n, s, p) => n + " " + (n > 1 ? p : s);
+    specs.innerHTML = [
+      plural(aptoActual.huespedes, "huésped", "huéspedes"),
+      aptoActual.habitaciones + " hab.",
+      plural(aptoActual.banos, "baño", "baños"),
+      aptoActual.metros + " m²",
+    ].map((t) => "<span>" + t + "</span>").join("");
+
+    document.getElementById("modal-servicios").innerHTML = aptoActual.servicios
+      .map((s) => "<span class='rounded-full bg-[var(--color-crema)] px-3 py-1 text-xs text-[var(--color-tinta)]'>" + s + "</span>")
+      .join("");
+
+    pintarFoto();
+    mostrarInfo();
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    pintarMiniMapa();
+  }
+
+  function cerrarModal() {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    document.body.style.overflow = "";
+    mostrarInfo();
+    resetForm();
+  }
+
+  // Pasar a vista formulario
+  btnReservar.addEventListener("click", () => {
+    document.getElementById("form-apto-img").src = aptoActual.imagenes[0];
+    document.getElementById("form-apto-nombre").textContent = aptoActual.nombre;
+    document.getElementById("form-apto-valor").value = aptoActual.nombre;
+    vistaInfo.classList.add("hidden");
+    vistaForm.classList.remove("hidden");
+  });
+
+  btnVolver.addEventListener("click", () => {
+    mostrarInfo();
+    pintarMiniMapa();
+  });
+
+  // --- Calendario de rango (modal) ---
+  const fechasBtn = document.getElementById("modal-fechas-btn");
+  const fechasLabel = document.getElementById("modal-fechas-label");
+  const calPanel = document.getElementById("modal-cal-panel");
+  const calTitulo = document.getElementById("modal-cal-titulo");
+  const calDias = document.getElementById("modal-cal-dias");
+  const calPrev = document.getElementById("modal-cal-prev");
+  const calNext = document.getElementById("modal-cal-next");
+  const calBorrar = document.getElementById("modal-cal-borrar");
+  const calCancelar = document.getElementById("modal-cal-cancelar");
+  const calConfirmar = document.getElementById("modal-cal-confirmar");
+
+  const fechasInput = document.createElement("input");
+  fechasInput.type = "hidden";
+  fechasInput.name = "fechas";
+  form.appendChild(fechasInput);
+
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  let mesVista = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  let inicio = null, fin = null;
+  let tmpInicio = null, tmpFin = null;
+  const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+
+  function fmt(d) { return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear(); }
+
+  function pintarCalendario() {
+    calTitulo.textContent = meses[mesVista.getMonth()] + " " + mesVista.getFullYear();
+    calDias.innerHTML = "";
+    const primerDia = new Date(mesVista.getFullYear(), mesVista.getMonth(), 1);
+    const offset = (primerDia.getDay() + 6) % 7;
+    const diasMes = new Date(mesVista.getFullYear(), mesVista.getMonth() + 1, 0).getDate();
+
+    for (let i = 0; i < offset; i++) calDias.appendChild(document.createElement("span"));
+
+    for (let dia = 1; dia <= diasMes; dia++) {
+      const fecha = new Date(mesVista.getFullYear(), mesVista.getMonth(), dia);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = String(dia);
+      btn.className = "mx-auto flex h-8 w-8 items-center justify-center rounded-full transition";
+
+      if (fecha < hoy) {
+        btn.className += " cursor-not-allowed text-[var(--color-arena-oscuro)]";
+        btn.disabled = true;
+      } else {
+        const esInicio = tmpInicio && fecha.getTime() === tmpInicio.getTime();
+        const esFin = tmpFin && fecha.getTime() === tmpFin.getTime();
+        const enMedio = tmpInicio && tmpFin && fecha > tmpInicio && fecha < tmpFin;
+        if (esInicio || esFin) btn.className += " bg-[var(--color-terracota)] text-white";
+        else if (enMedio) btn.className += " bg-[var(--color-terracota)]/20 text-[var(--color-tinta)]";
+        else btn.className += " text-[var(--color-tinta)] hover:bg-[var(--color-crema)]";
+        btn.addEventListener("click", () => seleccionar(fecha));
+      }
+      calDias.appendChild(btn);
+    }
+  }
+
+  function seleccionar(fecha) {
+    if (!tmpInicio || (tmpInicio && tmpFin)) { tmpInicio = fecha; tmpFin = null; }
+    else if (fecha < tmpInicio) { tmpInicio = fecha; }
+    else { tmpFin = fecha; }
+    pintarCalendario();
+  }
+
+  function actualizarLabel() {
+    if (inicio && fin) {
+      fechasLabel.textContent = fmt(inicio) + " → " + fmt(fin);
+      fechasLabel.classList.remove("text-[var(--color-gris)]");
+      fechasLabel.classList.add("text-[var(--color-tinta)]");
+      fechasInput.value = fmt(inicio) + " - " + fmt(fin);
+    } else {
+      fechasLabel.textContent = "Fechas de estancia *";
+      fechasLabel.classList.add("text-[var(--color-gris)]");
+      fechasLabel.classList.remove("text-[var(--color-tinta)]");
+      fechasInput.value = "";
+    }
+  }
+
+  function abrirCal() { tmpInicio = inicio; tmpFin = fin; calPanel.classList.remove("hidden"); pintarCalendario(); }
+  function cerrarCal() { calPanel.classList.add("hidden"); }
+
+  fechasBtn.addEventListener("click", () => {
+    if (calPanel.classList.contains("hidden")) abrirCal();
+    else cerrarCal();
+  });
+  calPrev.addEventListener("click", () => { mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() - 1, 1); pintarCalendario(); });
+  calNext.addEventListener("click", () => { mesVista = new Date(mesVista.getFullYear(), mesVista.getMonth() + 1, 1); pintarCalendario(); });
+  calBorrar.addEventListener("click", () => { tmpInicio = null; tmpFin = null; pintarCalendario(); });
+  calCancelar.addEventListener("click", () => { tmpInicio = inicio; tmpFin = fin; cerrarCal(); });
+  calConfirmar.addEventListener("click", () => {
+    inicio = tmpInicio; fin = tmpFin;
+    actualizarLabel();
+    if (inicio && fin) fechasBtn.classList.remove("border-red-500");
+    cerrarCal();
+  });
+
+  // --- Validación + envío ---
+  const reglas = {
+    nombre: "Introduce tu nombre.",
+    apellidos: "Introduce tus apellidos.",
+    email: "Introduce un correo válido.",
+    mensaje: "Escribe tu mensaje.",
+  };
+
+  function validarCampo(campo) {
+    const input = form.elements[campo];
+    const error = input.parentElement.querySelector(".error");
+    let valido = input.value.trim() !== "";
+    if (campo === "email" && valido) {
+      valido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+    }
+    if (!valido) {
+      input.classList.add("border-red-500");
+      if (error) { error.textContent = reglas[campo]; error.classList.remove("hidden"); }
+    } else {
+      input.classList.remove("border-red-500");
+      if (error) error.classList.add("hidden");
+    }
+    return valido;
+  }
+
+  function resetForm() {
+    form.reset();
+    inicio = null; fin = null; tmpInicio = null; tmpFin = null;
+    actualizarLabel();
+    cerrarCal();
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    let ok = true;
+    for (const campo in reglas) { if (!validarCampo(campo)) ok = false; }
+
+    if (!fechasInput.value) {
+      fechasBtn.classList.add("border-red-500");
+      ok = false;
+    } else {
+      fechasBtn.classList.remove("border-red-500");
+    }
+
+    if (!ok) return;
+
+    vistaForm.classList.add("hidden");
+    vistaOk.classList.remove("hidden");
+    vistaOk.classList.add("flex");
+
+    setTimeout(() => {
+      resetForm();
+      mostrarInfo();
+      pintarMiniMapa();
+    }, 3000);
+  });
+
+  for (const campo in reglas) {
+    form.elements[campo].addEventListener("input", () => validarCampo(campo));
+  }
+
+  // Listeners generales
+  document.querySelectorAll(".abrir-modal").forEach((btn) => {
+    btn.addEventListener("click", () => abrir(Number(btn.dataset.index)));
+  });
+  prev.addEventListener("click", () => {
+    fotoActual = (fotoActual - 1 + aptoActual.imagenes.length) % aptoActual.imagenes.length;
+    pintarFoto();
+  });
+  next.addEventListener("click", () => {
+    fotoActual = (fotoActual + 1) % aptoActual.imagenes.length;
+    pintarFoto();
+  });
+  cerrar.addEventListener("click", cerrarModal);
+  fondo.addEventListener("click", cerrarModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") cerrarModal();
+    if (modal.classList.contains("hidden")) return;
+    if (e.key === "ArrowLeft") prev.click();
+    if (e.key === "ArrowRight") next.click();
+  });
+
+  // Cargar Leaflet si no está
+  if (!window.L) {
+    const lscript = document.createElement("script");
+    lscript.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    lscript.onload = () => { if (!modal.classList.contains("hidden")) pintarMiniMapa(); };
+    document.head.appendChild(lscript);
+  }
+</script>
+<style>
+  /* Scroll oculto pero funcional */
+  .scroll-disimulado {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-disimulado::-webkit-scrollbar {
+    display: none;
+  }
+</style>

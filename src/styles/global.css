@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@theme {
+  /* Base neutra */
+  --color-blanco: #ffffff;
+  --color-crema: #faf8f5;
+  --color-tinta: #1c1a17;
+  --color-gris: #6b6660;
+
+  /* Acento terracota */
+  --color-terracota: #c2683f;
+  --color-terracota-oscuro: #a8542f;
+
+  /* Tipografías */
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-crema);
+  color: var(--color-tinta);
+  font-family: var(--font-body);
+}
+

@@ -1,0 +1,79 @@
+---
+const enlaces = [
+  { texto: "Alojamientos", href: "#apartamentos" },
+  { texto: "Sobre nosotros", href: "#sobre-nosotros" },
+  { texto: "Contacto", href: "#contacto" },
+];
+---
+
+<header class="sticky top-0 z-50 border-b border-[var(--color-arena-oscuro)] bg-[var(--color-crema)]/90 backdrop-blur">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+
+    <!-- Logo -->
+    <a href="#inicio" class="font-display text-xl font-semibold tracking-tight text-[var(--color-tinta)]">
+      CHCH<span class="text-[var(--color-terracota)]"> Apartments</span>
+    </a>
+
+    <!-- Nav escritorio -->
+    <div class="hidden items-center gap-8 md:flex">
+      {
+        enlaces.map((e) => (
+            <a  
+                href={e.href}
+                class="text-sm text-[var(--color-gris)] transition hover:text-[var(--color-tinta)]"
+            >
+                {e.texto}
+            </a>
+        ))
+      }
+      <a
+        href="#solicitud"
+        class="rounded-full bg-[var(--color-terracota)] px-5 py-2 text-sm font-medium text-white transition hover:bg-[var(--color-terracota-oscuro)]"
+      >
+        Reservar
+      </a>
+    </div>
+
+    <!-- Botón menú móvil -->
+    <button
+      id="btn-menu"
+      class="md:hidden"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[var(--color-tinta)]">
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+      </svg>
+    </button>
+  </nav>
+
+  <!-- Menú móvil desplegable -->
+  <div id="menu-movil" class="hidden border-t border-[var(--color-arena-oscuro)] px-6 py-4 md:hidden">
+    <div class="flex flex-col gap-4">
+      {
+        enlaces.map((e) => (
+          <a href={e.href} class="text-sm text-[var(--color-gris)] hover:text-[var(--color-tinta)]">
+            {e.texto}
+          </a>
+        ))
+      }
+      <a
+        href="#solicitud"
+        class="rounded-full bg-[var(--color-terracota)] px-5 py-2 text-center text-sm font-medium text-white"
+      >
+        Reservar
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById("btn-menu");
+  const menu = document.getElementById("menu-movil");
+  btn?.addEventListener("click", () => {
+    const abierto = menu?.classList.toggle("hidden");
+    btn.setAttribute("aria-expanded", String(!abierto));
+  });
+</script>
