@@ -17,48 +17,117 @@ import { apartamentos } from "../data/apartamentos.ts";
     </p>
   </div>
 
-  <div class="grid gap-8 sm:grid-cols-2">
+  <div class="flex flex-col">
     {
       apartamentos.map((apto, i) => (
-        <article class="group overflow-hidden rounded-3xl border border-[var(--color-arena-oscuro)] bg-white transition hover:shadow-xl">
-          <button
-            type="button"
-            class="abrir-modal relative block aspect-[3/2] w-full overflow-hidden text-left"
-            data-index={i}
-            aria-label={`Ver fotos de ${apto.nombre}`}
+        <article
+          class="flex flex-col gap-8 border-t border-[var(--color-arena-oscuro)] py-10 last:border-b md:flex-row md:items-center md:gap-10"
+          class:list={[{ "md:flex-row-reverse": i % 2 === 1 }]}
+        >
+          {/* Galería */}
+          <div
+            class="galeria relative w-full overflow-hidden rounded-3xl bg-black md:w-[52%]"
+            data-galeria={i}
           >
-            <img
-              src={apto.imagenes[0]}
-              alt={apto.nombre}
-              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-            />
-            <span class="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition group-hover:bg-black/20 group-hover:opacity-100">
-              <span class="rounded-full bg-white/90 px-4 py-2 text-xs font-medium text-[var(--color-tinta)]">
-                Ver fotos
-              </span>
-            </span>
-          </button>
-
-          <div class="p-6">
-            <div>
-              <h3 class="font-display text-xl font-semibold text-[var(--color-tinta)]">{apto.nombre}</h3>
-              <p class="text-sm text-[var(--color-terracota)]">{apto.ubicacion}</p>
+            <div class="relative aspect-[4/3] w-full">
+              {apto.imagenes.map((src, j) => (
+                <img
+                  src={src}
+                  alt={`${apto.nombre} — foto ${j + 1}`}
+                  loading="lazy"
+                  class="galeria-img absolute inset-0 h-full w-full object-cover transition-opacity duration-300"
+                  class:list={[j === 0 ? "opacity-100" : "opacity-0"]}
+                  data-slide={j}
+                />
+              ))}
             </div>
 
-            <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-t border-[var(--color-arena-oscuro)] pt-4 text-sm text-[var(--color-gris)]">
+            {apto.imagenes.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  class="galeria-prev absolute left-3 top-[42%] z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-[var(--color-tinta)] transition hover:bg-white"
+                  aria-label="Foto anterior"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6" /></svg>
+                </button>
+                <button
+                  type="button"
+                  class="galeria-next absolute right-3 top-[42%] z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/85 text-[var(--color-tinta)] transition hover:bg-white"
+                  aria-label="Foto siguiente"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6" /></svg>
+                </button>
+
+                {/* Miniaturas superpuestas */}
+                <div class="absolute inset-x-0 bottom-3 z-10 flex justify-center gap-1.5 px-3">
+                  {apto.imagenes.map((src, j) => (
+                    <button
+                      type="button"
+                      class="galeria-thumb h-8 w-10 overflow-hidden rounded-md shadow-md transition"
+                      class:list={[j === 0 ? "opacity-100 ring-2 ring-white" : "opacity-80"]}
+                      data-thumb={j}
+                      aria-label={`Ver foto ${j + 1}`}
+                    >
+                      <img src={src} alt="" class="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Info */}
+          <div
+            class="flex w-full flex-col md:w-[48%]"
+            class:list={[{ "md:items-end md:text-right": i % 2 === 1 }]}
+          >
+            <h3 class="font-display text-2xl font-semibold text-[var(--color-tinta)]">
+              {apto.nombre}
+            </h3>
+            <p class="mt-0.5 text-sm text-[var(--color-terracota)]">{apto.ubicacion}</p>
+
+            <div
+              class="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-y border-[var(--color-arena-oscuro)] py-4 text-sm text-[var(--color-gris)]"
+              class:list={[{ "md:justify-end": i % 2 === 1 }]}
+            >
               <span>{apto.huespedes} huésped{apto.huespedes > 1 ? "es" : ""}</span>
               <span>{apto.habitaciones} hab.</span>
               <span>{apto.banos} baño{apto.banos > 1 ? "s" : ""}</span>
               <span>{apto.metros} m²</span>
             </div>
 
-            <button
-              type="button"
-              class="abrir-modal mt-5 block w-full rounded-full bg-[var(--color-tinta)] px-5 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
-              data-index={i}
-            >
-              Ver detalles
-            </button>
+            <p class="mt-4 max-w-md text-sm leading-relaxed text-[var(--color-gris)]">
+              {apto.descripcion}
+            </p>
+
+            {apto.servicios?.length > 0 && (
+              <div
+                class="mt-4 flex flex-wrap gap-2"
+                class:list={[{ "md:justify-end": i % 2 === 1 }]}
+              >
+                {apto.servicios.map((s) => (
+                  <span class="rounded-full bg-[var(--color-crema)] px-3 py-1 text-xs text-[var(--color-tinta)]">
+                    {s}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Minimapa de ubicación */}
+            <div class="mt-6 w-full">
+              <p
+                class="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--color-oliva)]"
+                class:list={[{ "md:text-right": i % 2 === 1 }]}
+              >
+                Ubicación
+              </p>
+              <div
+                class="mapa-apto h-40 w-full overflow-hidden rounded-xl border border-[var(--color-arena-oscuro)]"
+                data-lat={apto.coordenadas.lat}
+                data-lng={apto.coordenadas.lng}
+              ></div>
+            </div>
           </div>
         </article>
       ))
@@ -66,78 +135,16 @@ import { apartamentos } from "../data/apartamentos.ts";
   </div>
 </section>
 
-<!-- MODAL -->
-<div
-  id="modal-apto"
-  class="fixed inset-0 z-[100] hidden items-center justify-center p-4"
-  role="dialog"
-  aria-modal="true"
->
-  <div id="modal-fondo" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-
-  <div class="relative z-10 flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl md:flex-row md:items-stretch">
-
-    <button
-      id="modal-cerrar"
-      class="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-[var(--color-tinta)] shadow transition hover:bg-white"
-      aria-label="Cerrar"
-    >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="6" y1="6" x2="18" y2="18" />
-        <line x1="18" y1="6" x2="6" y2="18" />
-      </svg>
-    </button>
-
-    <!-- Galería -->
-    <div class="relative w-full bg-black md:w-3/5">
-      <img id="modal-img" src="" alt="" class="aspect-[4/3] h-full w-full object-cover md:absolute md:inset-0 md:aspect-auto" />
-      <button id="modal-prev" class="absolute left-3 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[var(--color-tinta)] transition hover:bg-white" aria-label="Anterior">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
-      <button id="modal-next" class="absolute right-3 top-1/2 z-10 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 text-[var(--color-tinta)] transition hover:bg-white" aria-label="Siguiente">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      </button>
-      <span id="modal-contador" class="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-xs text-white"></span>
-    </div>
-
-    <!-- Barra lateral: solo INFO -->
-    <div class="scroll-disimulado flex w-full flex-col overflow-y-auto p-6 md:w-2/5">
-      <h3 id="modal-nombre" class="font-display text-2xl font-semibold text-[var(--color-tinta)]"></h3>
-      <p id="modal-ubicacion" class="text-sm text-[var(--color-terracota)]"></p>
-      <div id="modal-specs" class="mt-4 flex flex-wrap gap-x-5 gap-y-2 border-y border-[var(--color-arena-oscuro)] py-4 text-sm text-[var(--color-gris)]"></div>
-      <p id="modal-descripcion" class="mt-4 text-sm leading-relaxed text-[var(--color-gris)]"></p>
-      <div class="mt-4">
-        <p class="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--color-oliva)]">Servicios</p>
-        <div id="modal-servicios" class="flex flex-wrap gap-2"></div>
-      </div>
-
-      <!-- Minimapa de ubicación -->
-      <div class="mt-4">
-        <p class="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--color-oliva)]">Ubicación</p>
-        <div id="modal-mini-mapa" class="h-40 w-full overflow-hidden rounded-xl border border-[var(--color-arena-oscuro)]"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-<script define:vars={{ apartamentos }}>
-  const modal = document.getElementById("modal-apto");
-  const fondo = document.getElementById("modal-fondo");
-  const cerrar = document.getElementById("modal-cerrar");
-  const img = document.getElementById("modal-img");
-  const prev = document.getElementById("modal-prev");
-  const next = document.getElementById("modal-next");
-  const contador = document.getElementById("modal-contador");
+<script>
+  declare global {
+    interface Window {
+      L: any;
+    }
+  }
 
-  let aptoActual = null;
-  let fotoActual = 0;
-
-  // --- Minimapa ---
-  let miniMapa = null;
-  let miniMarcador = null;
   function iconoMini() {
     return window.L.divIcon({
       className: "",
@@ -146,11 +153,14 @@ import { apartamentos } from "../data/apartamentos.ts";
       iconAnchor: [7, 7],
     });
   }
-  function pintarMiniMapa() {
-    if (!aptoActual || !window.L) return;
-    const { lat, lng } = aptoActual.coordenadas;
-    if (!miniMapa) {
-      miniMapa = window.L.map("modal-mini-mapa", {
+
+  function pintarMapas() {
+    if (!window.L) return;
+    document.querySelectorAll<HTMLElement>(".mapa-apto").forEach((el) => {
+      if (el.dataset.iniciado === "true") return;
+      const lat = parseFloat(el.dataset.lat || "0");
+      const lng = parseFloat(el.dataset.lng || "0");
+      const mapa = window.L.map(el, {
         scrollWheelZoom: true,
         zoomControl: false,
         attributionControl: false,
@@ -160,92 +170,47 @@ import { apartamentos } from "../data/apartamentos.ts";
       window.L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
         maxZoom: 16,
         subdomains: "abcd",
-      }).addTo(miniMapa);
-      miniMarcador = window.L.marker([lat, lng], { icon: iconoMini() }).addTo(miniMapa);
-    } else {
-      miniMapa.setView([lat, lng], 14);
-      miniMarcador.setLatLng([lat, lng]);
+      }).addTo(mapa);
+      window.L.marker([lat, lng], { icon: iconoMini() }).addTo(mapa);
+      el.dataset.iniciado = "true";
+      setTimeout(() => mapa.invalidateSize(), 100);
+    });
+  }
+
+  // Galería (carrusel + miniaturas)
+  document.querySelectorAll<HTMLElement>(".galeria").forEach((galeria) => {
+    const imgs = galeria.querySelectorAll<HTMLElement>(".galeria-img");
+    const thumbs = galeria.querySelectorAll<HTMLElement>(".galeria-thumb");
+    const total = imgs.length;
+    let actual = 0;
+
+    function mostrar(n: number) {
+      actual = (n + total) % total;
+      imgs.forEach((img, j) => {
+        img.classList.toggle("opacity-100", j === actual);
+        img.classList.toggle("opacity-0", j !== actual);
+      });
+      thumbs.forEach((t, j) => {
+        const activo = j === actual;
+        t.classList.toggle("opacity-100", activo);
+        t.classList.toggle("ring-2", activo);
+        t.classList.toggle("ring-white", activo);
+        t.classList.toggle("opacity-80", !activo);
+      });
     }
-    setTimeout(() => miniMapa.invalidateSize(), 100);
-  }
 
-  function pintarFoto() {
-    if (!aptoActual) return;
-    img.src = aptoActual.imagenes[fotoActual];
-    img.alt = aptoActual.nombre + " - foto " + (fotoActual + 1);
-    contador.textContent = (fotoActual + 1) + " / " + aptoActual.imagenes.length;
-  }
-
-  function abrir(index) {
-    aptoActual = apartamentos[index];
-    fotoActual = 0;
-
-    document.getElementById("modal-nombre").textContent = aptoActual.nombre;
-    document.getElementById("modal-ubicacion").textContent = aptoActual.ubicacion;
-    document.getElementById("modal-descripcion").textContent = aptoActual.descripcion;
-
-    const specs = document.getElementById("modal-specs");
-    const plural = (n, s, p) => n + " " + (n > 1 ? p : s);
-    specs.innerHTML = [
-      plural(aptoActual.huespedes, "huésped", "huéspedes"),
-      aptoActual.habitaciones + " hab.",
-      plural(aptoActual.banos, "baño", "baños"),
-      aptoActual.metros + " m²",
-    ].map((t) => "<span>" + t + "</span>").join("");
-
-    document.getElementById("modal-servicios").innerHTML = aptoActual.servicios
-      .map((s) => "<span class='rounded-full bg-[var(--color-crema)] px-3 py-1 text-xs text-[var(--color-tinta)]'>" + s + "</span>")
-      .join("");
-
-    pintarFoto();
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-    document.body.style.overflow = "hidden";
-    pintarMiniMapa();
-  }
-
-  function cerrarModal() {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    document.body.style.overflow = "";
-  }
-
-  // Listeners generales
-  document.querySelectorAll(".abrir-modal").forEach((btn) => {
-    btn.addEventListener("click", () => abrir(Number(btn.dataset.index)));
-  });
-  prev.addEventListener("click", () => {
-    fotoActual = (fotoActual - 1 + aptoActual.imagenes.length) % aptoActual.imagenes.length;
-    pintarFoto();
-  });
-  next.addEventListener("click", () => {
-    fotoActual = (fotoActual + 1) % aptoActual.imagenes.length;
-    pintarFoto();
-  });
-  cerrar.addEventListener("click", cerrarModal);
-  fondo.addEventListener("click", cerrarModal);
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") cerrarModal();
-    if (modal.classList.contains("hidden")) return;
-    if (e.key === "ArrowLeft") prev.click();
-    if (e.key === "ArrowRight") next.click();
+    galeria.querySelector(".galeria-prev")?.addEventListener("click", () => mostrar(actual - 1));
+    galeria.querySelector(".galeria-next")?.addEventListener("click", () => mostrar(actual + 1));
+    thumbs.forEach((t, j) => t.addEventListener("click", () => mostrar(j)));
   });
 
-  // Cargar Leaflet si no está
-  if (!window.L) {
+  // Cargar Leaflet si no está y pintar los mapas
+  if (window.L) {
+    pintarMapas();
+  } else {
     const lscript = document.createElement("script");
     lscript.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    lscript.onload = () => { if (!modal.classList.contains("hidden")) pintarMiniMapa(); };
+    lscript.onload = pintarMapas;
     document.head.appendChild(lscript);
   }
 </script>
-<style>
-  /* Scroll oculto pero funcional */
-  .scroll-disimulado {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-  .scroll-disimulado::-webkit-scrollbar {
-    display: none;
-  }
-</style>

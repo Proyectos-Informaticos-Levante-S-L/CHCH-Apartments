@@ -5,13 +5,22 @@ import mapaHero from "../assets/mapa-hero.png";
 
 <section id="inicio" class="relative overflow-hidden">
 
-  <!-- Mapa decorativo: nítido a la derecha, se desvanece hacia la izquierda.
-       filter: contrast(1.4) resalta los grises sin tocar los blancos. -->
+  <!-- Mapa decorativo IZQUIERDA: muestra la parte izquierda de la imagen, se desvanece hacia el centro. -->
+  <div class="pointer-events-none absolute inset-y-0 left-0 z-0 hidden w-1/5 md:block" aria-hidden="true">
+    <Image
+      src={mapaHero}
+      alt=""
+      class="h-full w-full object-cover object-left"
+      style="filter: contrast(1); -webkit-mask-image: linear-gradient(to left, transparent 0%, rgba(0,0,0,0.35) 50%, black 100%); mask-image: linear-gradient(to left, transparent 0%, rgba(0,0,0,0.35) 50%, black 100%);"
+    />
+  </div>
+
+  <!-- Mapa decorativo DERECHA: muestra la parte derecha de la imagen, se desvanece hacia el centro. -->
   <div class="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-1/2 md:block" aria-hidden="true">
     <Image
       src={mapaHero}
       alt=""
-      class="h-full w-full object-cover"
+      class="h-full w-full object-cover object-right"
       style="filter: contrast(1); -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.35) 50%, black 100%); mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.35) 50%, black 100%);"
     />
   </div>
